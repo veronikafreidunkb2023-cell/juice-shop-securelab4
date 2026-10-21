@@ -2,7 +2,7 @@
  * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
-
+declare const process: any;
 import fs from 'node:fs'
 import crypto from 'node:crypto'
 import { type Request, type Response, type NextFunction } from 'express'
@@ -18,7 +18,8 @@ import * as utils from './utils'
 import * as z85 from 'z85'
 
 export const publicKey = fs ? fs.readFileSync('encryptionkeys/jwt.pub', 'utf8') : 'placeholder-public-key'
-const privateKey = fs ? fs.readFileSync('encryptionkeys/jwt.key', 'utf8') : 'placeholder-private-key'
+export const privateKey = process.env.JWT_PRIVATE_KEY || ''
+
 interface ResponseWithUser {
   status?: string
   data: UserModel
@@ -38,7 +39,7 @@ interface IAuthenticatedUsers {
 }
 
 export const hash = (data: string) => crypto.createHash('md5').update(data).digest('hex')
-export const hmac = (data: string) => crypto.createHmac('sha256', 'pa4qacea4VK9t9nGv7yZtwmj').update(data).digest('hex')
+export const defaultHmacKey = process.env.HMAC_KEY || ''
 
 export const cutOffPoisonNullByte = (str: string) => {
   const nullByte = '%00'
